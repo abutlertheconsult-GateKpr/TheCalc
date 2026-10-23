@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Calculator</title>
+<link rel="manifest" href="manifest.json">
+<link rel="icon" type="image/png" href="icons/icon-192.png">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+<meta name="theme-color" content="#ffffff">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Calculator">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<style>
+:root{--bg:#fff;--fg:#202124;--mut:#5f6368;--key:#f1f3f4;--op:#d3e3fd;--opf:#0b57d0;--eq:#0b57d0;--eqf:#fff;--ln:#dadce0;--card:#f8f9fa;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media(prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#202124;--fg:#e8eaed;--mut:#9aa0a6;--key:#303134;--op:#303d5a;--opf:#a8c7fa;--eq:#a8c7fa;--eqf:#062e6f;--ln:#3c4043;--card:#2d2e31}}
+:root[data-theme="dark"]{--bg:#202124;--fg:#e8eaed;--mut:#9aa0a6;--key:#303134;--op:#303d5a;--opf:#a8c7fa;--eq:#a8c7fa;--eqf:#062e6f;--ln:#3c4043;--card:#2d2e31}
+html,body{height:100%;margin:0}
+body{background:var(--bg);color:var(--fg);font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;-webkit-user-select:none;user-select:none;-webkit-tap-highlight-color:transparent}
+button{font:inherit;cursor:pointer;border:0;color:var(--fg)}
+#app{height:100%;display:flex;flex-direction:column;max-width:480px;margin:0 auto;padding:0 10px 10px}
+#disp{flex:1;display:flex;flex-direction:column;justify-content:flex-end;align-items:flex-end;padding:12px 14px;overflow:hidden;min-height:90px}
+#ex{font-size:26px;color:var(--mut);word-break:break-all;text-align:right;min-height:32px}
+#rs{font-size:54px;line-height:1.15;word-break:break-all;text-align:right;min-height:62px}
+#sci{display:grid;grid-template-columns:repeat(5,1fr);gap:2px;margin-bottom:6px;border-top:1px solid var(--ln);padding-top:6px}
+#sci button{background:none;height:38px;font-size:15px;color:var(--mut);border-radius:19px}
+#sci button.on{color:var(--opf);background:var(--op)}
+#pad{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+#pad button{height:clamp(50px,8.6vh,66px);border-radius:var(--rad,30px);background:var(--key);font-size:26px}
+#pad .o{background:var(--op);color:var(--opf)}
+#pad .e{background:var(--eq);color:var(--eqf)}
+:root[data-l="google"] #pad .e,#pad .z{grid-column:span 2}
+#pad .f{background:var(--fk,var(--key));color:var(--fkf,var(--fg))}
+:root[data-l="iphone"]{--bg:#000;--fg:#fff;--mut:#a5a5a5;--key:#333;--op:#ff9f0a;--opf:#fff;--eq:#ff9f0a;--eqf:#fff;--fk:#a5a5a5;--fkf:#000;--ln:#333;--card:#1c1c1e;--rad:999px}
+:root[data-l="samsung"]{--bg:#161616;--fg:#fff;--mut:#9a9a9a;--key:#262626;--op:#262626;--opf:#ff6a4d;--eq:#ff6a4d;--eqf:#fff;--fk:#262626;--fkf:#ff6a4d;--ln:#333;--card:#232323;--rad:22px}
+:root[data-l="windows"]{--bg:#f3f3f3;--fg:#1b1b1b;--mut:#5f5f5f;--key:#fbfbfb;--op:#f6f6f6;--opf:#1b1b1b;--eq:#0067c0;--eqf:#fff;--fk:#f6f6f6;--ln:#e5e5e5;--card:#fff;--rad:6px}
+@media(prefers-color-scheme:dark){:root[data-l="windows"]{--bg:#202020;--fg:#fff;--mut:#c5c5c5;--key:#3b3b3b;--op:#323232;--opf:#fff;--eq:#4cc2ff;--eqf:#000;--fk:#323232;--ln:#3c3c3c;--card:#2b2b2b}}
+:root[data-l="windows"] #pad{gap:3px}
+:root[data-l="windows"] #pad button{height:clamp(44px,7.2vh,58px);font-size:21px}
+#pad button:active,#sci button:active{filter:brightness(.92)}
+#ov,#vt{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;padding:16px}
+#ov{background:rgba(0,0,0,.5);z-index:10}
+#vt{background:var(--bg);z-index:5;flex-direction:column;align-items:stretch;justify-content:flex-start;overflow-y:auto;padding:calc(env(safe-area-inset-top,0px) + 12px) 16px 24px;-webkit-user-select:text;user-select:text}
+[hidden]{display:none!important}
+.dlg{background:var(--bg);border-radius:24px;padding:22px;width:100%;max-width:400px;max-height:90%;overflow-y:auto;box-shadow:0 8px 30px rgba(0,0,0,.35);-webkit-user-select:text;user-select:text}
+.dlg h3{margin:0 0 6px;font-weight:500;font-size:22px}
+.dlg p,.mut{color:var(--mut);font-size:14px;margin:4px 0 12px}
+input,select,textarea{width:100%;box-sizing:border-box;font:inherit;font-size:16px;padding:12px;margin:4px 0 10px;border:1px solid var(--ln);border-radius:10px;background:var(--bg);color:var(--fg)}
+label{font-size:12px;color:var(--mut)}
+.acts{display:flex;gap:8px;justify-content:flex-end;margin-top:8px;flex-wrap:wrap}
+.pill{background:var(--eq);color:var(--eqf);border-radius:20px;padding:10px 18px;font-size:15px}
+.ghost{background:none;color:var(--opf);border-radius:20px;padding:10px 14px;font-size:15px}
+.bar{display:flex;align-items:center;gap:4px;margin-bottom:10px}.bar h2{flex:1;margin:0;font-weight:500}
+.row{display:flex;gap:8px;align-items:center;margin-bottom:12px}.row select{margin:0}
+.card{background:var(--card);border-radius:18px;padding:16px}
+.f{padding:8px 0;border-bottom:1px solid var(--ln)}.f:last-of-type{border:0}
+.f b{display:block;font-size:12px;color:var(--mut);font-weight:400}.f span{word-break:break-all;white-space:pre-wrap}
+.sqr{display:flex;gap:6px}.sqr input{margin:2px 0 6px}
+.err{color:#d93025;font-size:14px;min-height:18px}
+#toast{position:fixed;left:50%;bottom:calc(env(safe-area-inset-bottom,0px) + 24px);transform:translateX(-50%);background:#323232;color:#fff;padding:10px 16px;border-radius:8px;font-size:14px;z-index:20;opacity:0;transition:opacity .2s;pointer-events:none}
+#toast.s{opacity:1}
+#sb{position:fixed;top:calc(env(safe-area-inset-top,0px) + 8px);left:50%;transform:translateX(-50%);width:calc(100% - 20px);max-width:460px;box-sizing:border-box;display:flex;align-items:center;gap:8px;background:var(--card);color:var(--fg);border:1px solid var(--ln);border-radius:14px;padding:6px 6px 6px 14px;font-size:14px;z-index:8;box-shadow:0 2px 8px rgba(0,0,0,.2)}
+#sb span{flex:1}
+.su #disp{padding-top:76px}
+#splash{position:fixed;inset:0;z-index:100;background:var(--bg);display:flex;align-items:center;justify-content:center;transition:opacity .35s}
+#splash.h{opacity:0;pointer-events:none}
+#splash img{width:112px;height:112px;border-radius:25px}
+</style></head>
+<body>
+<div id="splash"><img src="icons/icon-192.png" alt=""></div>
+<div id="app"><div id="disp"><div id="ex"></div><div id="rs"></div></div><div id="sci"></div><div id="pad"></div></div>
+<div id="vt" hidden></div><div id="ov" hidden></div><div id="toast"></div><div id="sb" hidden><span></span><button class="ghost" id="sbx">Cancel</button></div>
+<script>
+const $=s=>document.querySelector(s),enc=new TextEncoder(),dec=new TextDecoder();
+const esc=s=>String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+let ex='',last='',res='',done=false,deg=true,inv=false,setupMode=false,V=null,K=null,items=null,sel=0,showPw=false,tt;
+try{V=JSON.parse(localStorage.getItem('calc.v')||'null')}catch(e){}
+const toast=m=>{const t=$('#toast');t.textContent=m;t.classList.add('s');clearTimeout(tt);tt=setTimeout(()=>t.classList.remove('s'),2200)};
+/* ---------- calculator ---------- */
+const FN=['sin','cos','tan','asin','acos','atan','ln','log','sqrt','PI','E'];
+function calc(s){
+ if(!s)return '';
+ let o=(s.match(/\(/g)||[]).length,c=(s.match(/\)/g)||[]).length;s+=')'.repeat(Math.max(0,o-c));
+ let t=s.replace(/×/g,'*').replace(/÷/g,'/').replace(/−/g,'-').replace(/π/g,'PI').replace(/e/g,'E').replace(/√/g,'sqrt').replace(/\^/g,'**').replace(/%/g,'/100')
+  .replace(/(\d|\)|PI|E)(PI|E|sqrt|a?sin|a?cos|a?tan|ln|log|\()/g,'$1*$2').replace(/(PI|E|\))(\d)/g,'$1*$2');
+ const ids=t.match(/[A-Za-z]+/g)||[];if(!ids.every(i=>FN.includes(i)))return 'Error';
+ if(!/^[\w+\-*/().\s]*$/.test(t))return 'Error';
+ const d=x=>deg?x*Math.PI/180:x,r=x=>deg?x*180/Math.PI:x;
+ try{
+  const v=new Function('sin','cos','tan','asin','acos','atan','ln','log','sqrt','PI','E','"use strict";return ('+t+')')
+   (x=>Math.sin(d(x)),x=>Math.cos(d(x)),x=>Math.tan(d(x)),x=>r(Math.asin(x)),x=>r(Math.acos(x)),x=>r(Math.atan(x)),Math.log,Math.log10,Math.sqrt,Math.PI,Math.E);
+  if(typeof v!=='number'||!isFinite(v))return 'Error';
+  if(Math.abs(v)<1e-12)return '0';
+  return String(Number(v.toPrecision(12)));
+ }catch(e){return 'Error'}
+}
+const disp=s=>s.replace(/asin\(/g,'sin⁻¹(').replace(/acos\(/g,'cos⁻¹(').replace(/atan\(/g,'tan⁻¹(');
+function draw(){
+ $('#ex').textContent=done?last:disp(ex);
+ let r=res;if(!done){r=calc(ex);if(r==='Error'||r===ex)r=''}
+ $('#rs').textContent=r;
+ 
+}
+const SCI=[['deg','deg'],['inv','inv'],['sin','sin('],['cos','cos('],['tan','tan('],['ln','ln('],['log','log('],['^','^'],['√','√('],['π','π'],['e','e'],['(','('],[')',')'],['x²','^2'],['10ˣ','10^']];
+const N=[['7'],['8'],['9'],['×','×','o'],['4'],['5'],['6'],['−','−','o'],['1'],['2'],['3'],['+','+','o']];
+const LAY={
+ google:{n:'Google',pad:[['AC','ac','f'],['⌫','bk','f'],['%','%','o'],['÷','÷','o'],...N,['0'],['.'],['=','=','e']]},
+ iphone:{n:'iPhone',pad:[['AC','ac','f'],['±','neg','f'],['%','%','f'],['÷','÷','o'],...N,['0','0','z'],['.'],['=','=','e']]},
+ samsung:{n:'Android (Samsung)',pad:[['C','ac','f'],['⌫','bk','f'],['%','%','f'],['÷','÷','o'],...N,['±','neg','f'],['0'],['.'],['=','=','e']]},
+ windows:{n:'Windows',pad:[['%','%','f'],['CE','ac','f'],['C','ac','f'],['⌫','bk','f'],['1/x','rec','f'],['x²','^2','f'],['√','√(','f'],['÷','÷','f'],...N,['±','neg','f'],['0'],['.'],['=','=','e']]}
+};
+let lay='google';try{lay=localStorage.getItem('calc.l')||'google'}catch(e){}if(!LAY[lay])lay='google';
+function setLay(l){lay=l;try{localStorage.setItem('calc.l',l)}catch(e){}build()}
+function build(){
+ $('#sci').innerHTML=SCI.map(([l,k])=>{
+  let t=l,on='';if(k==='deg')t=deg?'Deg':'Rad';if(k==='inv')on=inv?' class="on"':'';
+  if(inv&&['sin','cos','tan'].includes(l))t=l+'⁻¹';
+  return `<button data-k="${k}"${on}>${t}</button>`}).join('');
+ document.documentElement.dataset.l=lay;$('#pad').innerHTML=LAY[lay].pad.map(([l,k,c])=>`<button data-k="${k||l}" ${c?`class="${c}"`:''}>${l}</button>`).join('');
+}
+function press(k){
+ if(k==='ac'){ex='';last='';res='';done=false;return draw()}
+ if(k==='bk'){if(done){ex='';done=false}else ex=ex.replace(/(asin\(|acos\(|atan\(|sin\(|cos\(|tan\(|ln\(|log\(|√\(|.)$/,'');return draw()}
+ if(k==='neg'){if(done){ex=res==='Error'?'':res;done=false}ex=ex.startsWith('−')?ex.slice(1):'−'+ex;return draw()}
+ if(k==='rec'){if(done){ex=res==='Error'?'':res;done=false}if(ex)ex='1÷('+ex+')';return draw()}
+ if(k==='=')return eq();
+ if(k==='deg'){deg=!deg;return build()}
+ if(k==='inv'){inv=!inv;return build()}
+ let t=k;if(inv&&/^(sin|cos|tan)\($/.test(k))t='a'+k;
+ if(done){if(!/^[+−×÷^%]$/.test(t))ex='';done=false}
+ if(/[+−×÷^]$/.test(ex)&&/^[+×÷^]$/.test(t))ex=ex.slice(0,-1);
+ ex+=t;draw();
+}
+async function eq(){
+ if(!ex)return;
+ const seq=ex,r=calc(seq);
+ last=disp(seq)+' =';res=r||'Error';done=true;ex=res==='Error'?'':res;draw();
+ if(!V&&!su&&seq==='9455'){ex='';suWelcome();return}
+ if(su){ex='';suSeq(seq,res);return}
+ if(V&&res!=='Error'&&await sh(V.s+seq)===V.h)askPass(seq);
+}
+$('#app').addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;press(b.dataset.k)});
+document.addEventListener('keydown',e=>{if(!$('#ov').hidden||!$('#vt').hidden)return;const m={'*':'×','/':'÷','-':'−'};
+ if(/^[0-9.+()^%]$/.test(e.key))press(e.key);else if(m[e.key])press(m[e.key]);else if(e.key==='Enter'){e.preventDefault();press('=')}else if(e.key==='Backspace')press('bk');else if(e.key==='Escape')press('ac')});
+/* ---------- crypto ---------- */
+const b64=u=>btoa(String.fromCharCode(...new Uint8Array(u))),ub=s=>Uint8Array.from(atob(s),c=>c.charCodeAt(0));
+const sh=async s=>b64(await crypto.subtle.digest('SHA-256',enc.encode(s)));
+async function dk(seq,pw,salt){const m=await crypto.subtle.importKey('raw',enc.encode(seq+'\u0000'+pw),'PBKDF2',false,['deriveKey']);
+ return crypto.subtle.deriveKey({name:'PBKDF2',salt,iterations:250000,hash:'SHA-256'},m,{name:'AES-GCM',length:256},false,['encrypt','decrypt'])}
+async function persist(){const iv=crypto.getRandomValues(new Uint8Array(12));
+ V.iv=b64(iv);V.d=b64(await crypto.subtle.encrypt({name:'AES-GCM',iv},K,enc.encode(JSON.stringify(items))));
+ try{localStorage.setItem('calc.v',JSON.stringify(V))}catch(e){toast('Could not save on this device')}}
+/* ---------- dialogs ---------- */
+const dlg=h=>{const o=$('#ov');o.innerHTML=`<div class="dlg">${h}</div>`;o.hidden=false};
+const close=()=>{$('#ov').hidden=true;$('#ov').innerHTML=''};
+function askPass(seq){
+ dlg(`<h3>Enter passcode</h3><input id="pw" type="password" autocomplete="off" autocapitalize="off" spellcheck="false"><div class="err" id="er"></div><div class="acts"><button class="ghost" id="no">Cancel</button><button class="pill" id="go">OK</button></div>`);
+ $('#pw').focus();$('#no').onclick=close;
+ const go=async()=>{$('#go').disabled=true;try{const k=await dk(seq,$('#pw').value,ub(V.s));
+  items=JSON.parse(dec.decode(await crypto.subtle.decrypt({name:'AES-GCM',iv:ub(V.iv)},k,ub(V.d))));K=k;close();sel=-1;showPw=false;vault()}
+  catch(e){$('#er').textContent='Incorrect passcode';$('#go').disabled=false;$('#pw').select()}};
+ $('#go').onclick=go;$('#pw').onkeydown=e=>{if(e.key==='Enter')go()};
+}
+let su=null,suP='';
+const sb=t=>{const b=$('#sb');b.hidden=!t;document.body.classList.toggle('su',!!t);if(t)b.querySelector('span').textContent=t};
+function suEnd(){su=null;suP='';sb('');close();ex='';last='';res='';done=false;draw()}
+function suWelcome(){
+ dlg(`<h3>Set up your vault</h3><p>This takes about a minute. Here is what happens:</p><ol style="color:var(--mut);font-size:14px;padding-left:20px;margin:0 0 12px;line-height:1.6"><li>Press your secret keys and =</li><li>Press the same keys again to confirm</li><li>Choose a passcode</li><li>Test it once</li><li>Save a reminder of how to open it</li></ol><p><b>There is no recovery.</b> If you forget your keys or passcode, nothing can bring your passwords back.</p><div class="acts"><button class="ghost" id="no">Cancel</button><button class="pill" id="go">Start</button></div>`);
+ $('#no').onclick=suEnd;$('#go').onclick=()=>{close();su={step:1};ex='';last='';res='';done=false;draw();sb('Step 1 of 5: press your secret keys, then =')};
+}
+function suSeq(seq,r){
+ if(r==='Error'||seq.length<3)return sb('Use at least 3 keys that give a number, then press =');
+ if(su.step===1){su.seq=seq;su.res=r;su.step=2;return sb('Step 2 of 5: press the same keys again, then =')}
+ if(seq!==su.seq){su.step=1;return sb('Those keys did not match. Start again: press your secret keys, then =')}
+ suPass();
+}
+function suPass(){
+ sb('');
+ dlg(`<h3>Step 3 of 5: choose a passcode</h3><p>Letters and numbers, at least 6 characters. Do not include the answer (${esc(su.res)}) here.</p><input id="p1" type="password" placeholder="Passcode" autocomplete="off" autocapitalize="off"><input id="p2" type="password" placeholder="Confirm passcode" autocomplete="off" autocapitalize="off"><div class="err" id="er"></div><div class="acts"><button class="ghost" id="no">Cancel</button><button class="pill" id="go">Next</button></div>`);
+ $('#no').onclick=suEnd;$('#p1').focus();
+ $('#go').onclick=()=>{const a=$('#p1').value;if(a.length<6)return $('#er').textContent='Use at least 6 characters';if(a!==$('#p2').value)return $('#er').textContent='Passcodes do not match';suP=a;suTest()};
+}
+function suTest(){
+ dlg(`<h3>Step 4 of 5: test it</h3><p>Type your passcode followed by ${esc(su.res)}. Setup finishes only when this works, so you cannot lock yourself out.</p><input id="pw" type="password" autocomplete="off" autocapitalize="off"><div class="err" id="er"></div><div class="acts"><button class="ghost" id="no">Back</button><button class="pill" id="go">Check</button></div>`);
+ $('#no').onclick=suPass;$('#pw').focus();
+ $('#go').onclick=async()=>{if($('#pw').value!==suP+su.res)return $('#er').textContent='That is not your passcode followed by '+su.res+'. Try again.';
+  $('#go').disabled=true;const s=b64(crypto.getRandomValues(new Uint8Array(16)));
+  V={s,h:await sh(s+su.seq)};K=await dk(su.seq,suP+su.res,ub(s));items=[];await persist();suDone()};
+}
+function suDone(){
+ dlg(`<h3>Step 5 of 5: you are set</h3><div class="card" style="margin:10px 0"><div class="f"><b>1. Press these keys</b><span>${esc(disp(su.seq))} =</span></div><div class="f"><b>2. Type your passcode followed by</b><span>${esc(su.res)}</span></div></div><p>Write this down somewhere safe. The app does not keep this reminder, and there is no recovery.</p><div class="acts"><button class="pill" id="go">Finish</button></div>`);
+ $('#go').onclick=()=>{su=null;suP='';sb('');close();ex='';last='';res='';done=false;draw();sel=-1;showPw=false;vault()};
+}
+$('#sbx').onclick=suEnd;
+/* ---------- vault ---------- */
+function lock(){items=null;K=null;showPw=false;ex='';last='';res='';done=false;draw();$('#vt').hidden=true;$('#vt').innerHTML='';close()}
+document.addEventListener('visibilitychange',()=>{if(document.hidden&&items)lock()});
+function vault(){
+ const o=$('#vt');o.hidden=false;if(sel>=items.length)sel=-1;
+ const it=items[sel];
+ const f=(l,v)=>v?`<div class="f"><b>${l}</b><span>${esc(v)}</span></div>`:'';
+ o.innerHTML=`<div class="bar"><h2>Passwords</h2><button class="ghost" data-a="gear" aria-label="Settings" style="font-size:22px">⚙</button><button class="ghost" data-a="lock">Lock</button></div>
+ <div class="row">${items.length?`<select id="sl"><option value="-1"${sel<0?' selected':''}>Select Password</option>${items.map((x,i)=>`<option value="${i}"${i===sel?' selected':''}>${esc(x.site||'Untitled')}</option>`).join('')}</select>`:'<div class="mut" style="flex:1;margin:0">No passwords yet</div>'}<button class="pill" data-a="add">+ Add</button></div>
+ ${it?`<div class="card">${f('Website',it.site)}${f('Username / email',it.user)}<div class="f"><b>Password</b><span>${showPw?esc(it.pw):'••••••••••'}</span></div>${f('Hint',it.hint)}${(it.sq||[]).map(x=>f('Security question: '+esc(x.q),x.a)).join('')}${f('Notes',it.notes)}${f('Last changed',new Date(it.at).toLocaleString())}
+ <div class="acts"><button class="ghost" data-a="show">${showPw?'Hide':'Show'}</button><button class="ghost" data-a="cp">Copy password</button><button class="ghost" data-a="cu">Copy username</button><button class="ghost" data-a="edit">Edit</button><button class="ghost" data-a="del">Delete</button></div></div>`:''}`;
+ const s=$('#sl');if(s)s.onchange=()=>{sel=+s.value;showPw=false;vault()};
+}
+let delArm=false;
+const copy=async t=>{try{await navigator.clipboard.writeText(t);toast('Copied')}catch(e){toast('Copy not available')}};
+$('#vt').addEventListener('click',async e=>{const a=e.target.closest('[data-a]')?.dataset.a;if(!a)return;const it=items[sel];
+ if(a==='lock')lock();else if(a==='add')form(null);else if(a==='edit')form(sel);
+ else if(a==='show'){showPw=!showPw;vault()}
+ else if(a==='cp')copy(it.pw);else if(a==='cu')copy(it.user||'');
+ else if(a==='del'){if(!delArm){delArm=true;toast('Tap Delete again to confirm');setTimeout(()=>delArm=false,3000)}else{delArm=false;items.splice(sel,1);sel=-1;await persist();vault()}}
+ else if(a==='gear')settings();
+});
+function gen(){const c='abcdefghijkmnopqrstuvwxyzABCDEFGHJKLMNPQRSTUVWXYZ23456789!@#$%^&*-_';const r=crypto.getRandomValues(new Uint32Array(18));return[...r].map(n=>c[n%c.length]).join('')}
+function sqRow(q='',a=''){return `<div class="sqr"><input placeholder="Question" value="${esc(q)}"><input placeholder="Answer" value="${esc(a)}"></div>`}
+function form(idx){
+ const x=idx==null?{site:'',user:'',pw:'',hint:'',sq:[],notes:''}:items[idx];
+ dlg(`<h3>${idx==null?'Add password':'Edit password'}</h3>
+ <label>Website</label><input id="f1" value="${esc(x.site)}" autocapitalize="off">
+ <label>Username / email</label><input id="f2" value="${esc(x.user)}" autocapitalize="off">
+ <label>Password</label><input id="f3" type="password" value="${esc(x.pw)}" autocomplete="off" autocapitalize="off">
+ <div class="acts" style="margin:-4px 0 8px;justify-content:flex-start"><button class="ghost" id="tg">Show</button><button class="ghost" id="gn">Generate</button></div>
+ <label>Hint</label><input id="f4" value="${esc(x.hint)}">
+ <label>Security questions</label><div id="sqs">${(x.sq.length?x.sq:[{q:'',a:''}]).map(s=>sqRow(s.q,s.a)).join('')}</div>
+ <button class="ghost" id="aq" style="padding-left:0">+ Add question</button><br>
+ <label>Notes</label><textarea id="f5" rows="3">${esc(x.notes)}</textarea>
+ <label>Last changed</label><div class="mut" style="margin-top:2px">${idx==null?'Set automatically when you save':new Date(x.at).toLocaleString()+' (updates automatically)'}</div>
+ <div class="err" id="er"></div><div class="acts"><button class="ghost" id="no">Cancel</button><button class="pill" id="sv">Save</button></div>`);
+ $('#no').onclick=close;
+ $('#tg').onclick=()=>{const p=$('#f3');p.type=p.type==='password'?'text':'password';$('#tg').textContent=p.type==='text'?'Hide':'Show'};
+ $('#gn').onclick=()=>{$('#f3').value=gen();$('#f3').type='text';$('#tg').textContent='Hide'};
+ $('#aq').onclick=()=>$('#sqs').insertAdjacentHTML('beforeend',sqRow());
+ $('#sv').onclick=async()=>{const g=id=>$('#'+id).value.trim();
+  const sq=[...document.querySelectorAll('.sqr')].map(r=>({q:r.children[0].value.trim(),a:r.children[1].value.trim()})).filter(s=>s.q||s.a);
+  const n={site:g('f1'),user:g('f2'),pw:$('#f3').value,hint:g('f4'),sq,notes:g('f5')};
+  if(!n.site&&!n.pw)return $('#er').textContent='Add a website or a password';
+  if(idx==null){n.at=Date.now();items.push(n);sel=-1}
+  else{const o=items[idx];n.at=JSON.stringify({...o,at:0})!==JSON.stringify({...n,at:0})?Date.now():o.at;items[idx]=n}
+  await persist();close();vault()};
+}
+function settings(){
+ dlg(`<h3>Settings</h3><label>Calculator layout</label><select id="ly">${Object.keys(LAY).map(k=>`<option value="${k}"${k===lay?' selected':''}>${LAY[k].n}</option>`).join('')}</select><div class="acts" style="justify-content:flex-start"><button class="ghost" id="xi">Export / Import</button><button class="ghost" id="rst" style="color:#d93025">Reset app</button></div><div class="acts"><button class="pill" id="no">Done</button></div>`);
+ $('#no').onclick=close;$('#ly').onchange=e=>setLay(e.target.value);$('#xi').onclick=backup;
+ $('#rst').onclick=()=>{dlg(`<h3>Reset app?</h3><p>This erases every saved password, your secret sequence and your passcode. Export a backup first if you want to keep them. After a reset, typing 9455= starts setup again.</p><div class="acts"><button class="ghost" id="no">Cancel</button><button class="pill" id="go" style="background:#d93025;color:#fff">Erase everything</button></div>`);$('#no').onclick=settings;$('#go').onclick=()=>{try{localStorage.removeItem('calc.v')}catch(e){}V=null;lock();toast('App reset')}};
+}
+function backup(){
+ dlg(`<h3>Backup</h3><p>This text is your encrypted vault. Copy it somewhere safe. It opens only with your sequence and passcode. To restore, paste a backup below and tap Restore (this replaces what is on this device).</p><textarea id="bt" rows="6">${esc(JSON.stringify(V))}</textarea><div class="err" id="er"></div><div class="acts"><button class="ghost" id="no">Close</button><button class="ghost" id="cb">Copy</button><button class="pill" id="rs2">Restore</button></div>`);
+ $('#no').onclick=close;$('#cb').onclick=()=>copy($('#bt').value);
+ $('#rs2').onclick=()=>{try{const v=JSON.parse($('#bt').value);if(!v.s||!v.h||!v.iv||!v.d)throw 0;localStorage.setItem('calc.v',JSON.stringify(v));V=v;lock();toast('Restored. Use your sequence and passcode.')}catch(e){$('#er').textContent='That backup is not valid'}};
+}
+build();draw();
+</script><script>
+setTimeout(()=>{const s=document.getElementById('splash');if(!s)return;s.classList.add('h');setTimeout(()=>s.remove(),400)},2000);
+if('serviceWorker' in navigator)window.addEventListener('load',()=>navigator.serviceWorker.register('sw.js').catch(()=>{}));
+</script></body></html>
