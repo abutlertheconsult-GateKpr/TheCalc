@@ -11,24 +11,26 @@
 <meta name="apple-mobile-web-app-title" content="Calculator">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
 <style>
-:root{--bg:#fff;--fg:#202124;--mut:#5f6368;--key:#f1f3f4;--op:#d3e3fd;--opf:#0b57d0;--eq:#0b57d0;--eqf:#fff;--ln:#dadce0;--card:#f8f9fa;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
-@media(prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#202124;--fg:#e8eaed;--mut:#9aa0a6;--key:#303134;--op:#303d5a;--opf:#a8c7fa;--eq:#a8c7fa;--eqf:#062e6f;--ln:#3c4043;--card:#2d2e31}}
-:root[data-theme="dark"]{--bg:#202124;--fg:#e8eaed;--mut:#9aa0a6;--key:#303134;--op:#303d5a;--opf:#a8c7fa;--eq:#a8c7fa;--eqf:#062e6f;--ln:#3c4043;--card:#2d2e31}
+:root{--bg:#f6f8fc;--fg:#1d2230;--mut:#5b6272;--key:#e6eaf3;--op:#d9e0ee;--opf:#1d2230;--eq:#d6c6f6;--eqf:#3a2a62;--ak:#bccdea;--akf:#1d2230;--ln:#d6dbe6;--card:#eef1f7;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media(prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0c0e13;--fg:#e6e9f2;--mut:#9aa1b3;--key:#22252e;--op:#353b4d;--opf:#e1e5f2;--eq:#ecdcff;--eqf:#4a3a6b;--ak:#46587a;--akf:#e8ecf7;--ln:#2b2f3a;--card:#1b1e26}}
+:root[data-theme="dark"]{--bg:#0c0e13;--fg:#e6e9f2;--mut:#9aa1b3;--key:#22252e;--op:#353b4d;--opf:#e1e5f2;--eq:#ecdcff;--eqf:#4a3a6b;--ak:#46587a;--akf:#e8ecf7;--ln:#2b2f3a;--card:#1b1e26}
 html,body{height:100%;margin:0}
 body{background:var(--bg);color:var(--fg);font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;-webkit-user-select:none;user-select:none;-webkit-tap-highlight-color:transparent}
 button{font:inherit;cursor:pointer;border:0;color:var(--fg)}
 #app{height:100%;display:flex;flex-direction:column;max-width:480px;margin:0 auto;padding:0 10px 10px}
 #disp{flex:1;display:flex;flex-direction:column;justify-content:flex-end;align-items:flex-end;padding:12px 14px;overflow:hidden;min-height:90px}
 #ex{font-size:26px;color:var(--mut);word-break:break-all;text-align:right;min-height:32px}
-#rs{font-size:54px;line-height:1.15;word-break:break-all;text-align:right;min-height:62px}
-#sci{display:grid;grid-template-columns:repeat(5,1fr);gap:2px;margin-bottom:6px;border-top:1px solid var(--ln);padding-top:6px}
+#rs{font-size:76px;line-height:1.15;word-break:break-all;text-align:right;min-height:88px}
+#sci{display:none;grid-template-columns:repeat(5,1fr);gap:2px;margin-bottom:6px;border-top:1px solid var(--ln);padding-top:6px}
 #sci button{background:none;height:38px;font-size:15px;color:var(--mut);border-radius:19px}
 #sci button.on{color:var(--opf);background:var(--op)}
 #pad{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
-#pad button{height:clamp(50px,8.6vh,66px);border-radius:var(--rad,30px);background:var(--key);font-size:26px}
+#pad button{height:clamp(54px,10vh,88px);border-radius:var(--rad,30px);background:var(--key);font-size:26px}
 #pad .o{background:var(--op);color:var(--opf)}
 #pad .e{background:var(--eq);color:var(--eqf)}
-:root[data-l="google"] #pad .e,#pad .z{grid-column:span 2}
+#pad .z{grid-column:span 2}
+#pad .a{background:var(--ak,var(--fk,var(--key)));color:var(--akf,var(--fkf,var(--fg)))}
+:root[data-l="google"]{--rad:999px}
 #pad .f{background:var(--fk,var(--key));color:var(--fkf,var(--fg))}
 :root[data-l="iphone"]{--bg:#000;--fg:#fff;--mut:#a5a5a5;--key:#333;--op:#ff9f0a;--opf:#fff;--eq:#ff9f0a;--eqf:#fff;--fk:#a5a5a5;--fkf:#000;--ln:#333;--card:#1c1c1e;--rad:999px}
 :root[data-l="samsung"]{--bg:#161616;--fg:#fff;--mut:#9a9a9a;--key:#262626;--op:#262626;--opf:#ff6a4d;--eq:#ff6a4d;--eqf:#fff;--fk:#262626;--fkf:#ff6a4d;--ln:#333;--card:#232323;--rad:22px}
@@ -61,13 +63,30 @@ label{font-size:12px;color:var(--mut)}
 #sb{position:fixed;top:calc(env(safe-area-inset-top,0px) + 8px);left:50%;transform:translateX(-50%);width:calc(100% - 20px);max-width:460px;box-sizing:border-box;display:flex;align-items:center;gap:8px;background:var(--card);color:var(--fg);border:1px solid var(--ln);border-radius:14px;padding:6px 6px 6px 14px;font-size:14px;z-index:8;box-shadow:0 2px 8px rgba(0,0,0,.2)}
 #sb span{flex:1}
 .su #disp{padding-top:76px}
+.su #top{visibility:hidden}
+#sci.open{display:grid}
+#mx{position:fixed;inset:0;width:100%;height:100%;z-index:9;background:#000}
+body.mxon #ov{background:rgba(0,0,0,.18)}
+#pv{font-size:26px;color:var(--mut);min-height:34px;text-align:right}
+#top{display:flex;justify-content:space-between;padding:6px 2px 0}
+#top button,#chev button{background:none;width:48px;height:48px;border-radius:24px;color:var(--mut);display:flex;align-items:center;justify-content:center}
+#chev{padding:0 2px}
+#hv{position:fixed;inset:0;z-index:6;background:var(--bg);display:flex;flex-direction:column;padding-top:calc(env(safe-area-inset-top,0px) + 8px);max-width:480px;margin:0 auto}
+#hl{overflow-y:auto;flex:1}
+.hi{display:flex;align-items:center;gap:6px;padding:10px 14px;border-bottom:1px solid var(--ln)}
+.hr{flex:1;text-align:right;cursor:pointer}
+.he{color:var(--mut);font-size:18px;word-break:break-all}
+.hv{font-size:34px;word-break:break-all}
+.hd{background:none;color:var(--mut);font-size:16px;padding:10px}
+#pm{position:fixed;top:calc(env(safe-area-inset-top,0px) + 54px);right:12px;z-index:7;background:var(--card);border-radius:12px;box-shadow:0 4px 16px rgba(0,0,0,.3);padding:4px}
+#pm button{background:none;font-size:16px;padding:12px 18px;color:var(--fg)}
 #splash{position:fixed;inset:0;z-index:100;background:var(--bg);display:flex;align-items:center;justify-content:center;transition:opacity .35s}
 #splash.h{opacity:0;pointer-events:none}
 #splash img{width:112px;height:112px;border-radius:25px}
 </style></head>
 <body>
 <div id="splash"><img src="icons/icon-192.png" alt=""></div>
-<div id="app"><div id="disp"><div id="ex"></div><div id="rs"></div></div><div id="sci"></div><div id="pad"></div></div>
+<div id="app"><div id="top"><button id="hbtn" aria-label="History"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 3-6.7L3 8"/><path d="M3 3v5h5"/><path d="M12 7v5l3 2"/></svg></button><button id="mnu" aria-label="More options"><svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="5" r="2"/><circle cx="12" cy="12" r="2"/><circle cx="12" cy="19" r="2"/></svg></button></div><div id="disp"><div id="ex"></div><div id="rs"></div><div id="pv"></div></div><div id="chev"><button id="cv" aria-label="Scientific keys"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 9l5-5 5 5M7 15l5 5 5-5"/></svg></button></div><div id="sci"></div><div id="pad"></div></div><div id="hv" hidden></div><canvas id="mx" hidden></canvas><div id="pm" hidden><button id="pmc">Clear history</button></div>
 <div id="vt" hidden></div><div id="ov" hidden></div><div id="toast"></div><div id="sb" hidden><span></span><button class="ghost" id="sbx">Cancel</button></div>
 <script>
 const $=s=>document.querySelector(s),enc=new TextEncoder(),dec=new TextDecoder();
@@ -95,15 +114,17 @@ function calc(s){
 }
 const disp=s=>s.replace(/asin\(/g,'sin⁻¹(').replace(/acos\(/g,'cos⁻¹(').replace(/atan\(/g,'tan⁻¹(');
 function draw(){
- $('#ex').textContent=done?last:disp(ex);
- let r=res;if(!done){r=calc(ex);if(r==='Error'||r===ex)r=''}
- $('#rs').textContent=r;
- 
+ const big=done?res:disp(ex);
+ $('#ex').textContent=done?last:'';
+ $('#rs').textContent=big;
+ let p='';if(!done){p=calc(ex);if(p==='Error'||p===ex)p=''}
+ $('#pv').textContent=p;
+ const L=big.length;$('#rs').style.fontSize=(L<=7?76:L<=10?62:L<=13?50:40)+'px';
 }
 const SCI=[['deg','deg'],['inv','inv'],['sin','sin('],['cos','cos('],['tan','tan('],['ln','ln('],['log','log('],['^','^'],['√','√('],['π','π'],['e','e'],['(','('],[')',')'],['x²','^2'],['10ˣ','10^']];
 const N=[['7'],['8'],['9'],['×','×','o'],['4'],['5'],['6'],['−','−','o'],['1'],['2'],['3'],['+','+','o']];
 const LAY={
- google:{n:'Google',pad:[['AC','ac','f'],['⌫','bk','f'],['%','%','o'],['÷','÷','o'],...N,['0'],['.'],['=','=','e']]},
+ google:{n:'Google',pad:[['AC','ac','a'],['( )','par','o'],['%','%','o'],['÷','÷','o'],...N,['0'],['.'],['⌫','bk','f'],['=','=','e']]},
  iphone:{n:'iPhone',pad:[['AC','ac','f'],['±','neg','f'],['%','%','f'],['÷','÷','o'],...N,['0','0','z'],['.'],['=','=','e']]},
  samsung:{n:'Android (Samsung)',pad:[['C','ac','f'],['⌫','bk','f'],['%','%','f'],['÷','÷','o'],...N,['±','neg','f'],['0'],['.'],['=','=','e']]},
  windows:{n:'Windows',pad:[['%','%','f'],['CE','ac','f'],['C','ac','f'],['⌫','bk','f'],['1/x','rec','f'],['x²','^2','f'],['√','√(','f'],['÷','÷','f'],...N,['±','neg','f'],['0'],['.'],['=','=','e']]}
@@ -125,6 +146,7 @@ function press(k){
  if(k==='=')return eq();
  if(k==='deg'){deg=!deg;return build()}
  if(k==='inv'){inv=!inv;return build()}
+ if(k==='par'){const o=(ex.match(/\(/g)||[]).length,c=(ex.match(/\)/g)||[]).length;k=(!done&&o>c&&/[\d)πe]$/.test(ex))?')':'('}
  let t=k;if(inv&&/^(sin|cos|tan)\($/.test(k))t='a'+k;
  if(done){if(!/^[+−×÷^%]$/.test(t))ex='';done=false}
  if(/[+−×÷^]$/.test(ex)&&/^[+×÷^]$/.test(t))ex=ex.slice(0,-1);
@@ -136,10 +158,11 @@ async function eq(){
  last=disp(seq)+' =';res=r||'Error';done=true;ex=res==='Error'?'':res;draw();
  if(!V&&!su&&seq==='9455'){ex='';suWelcome();return}
  if(su){ex='';suSeq(seq,res);return}
- if(V&&res!=='Error'&&await sh(V.s+seq)===V.h)askPass(seq);
+ if(V&&res!=='Error'&&await sh(V.s+seq)===V.h){askPass(seq);return}
+ if(res!=='Error')addHist(seq,res);
 }
-$('#app').addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;press(b.dataset.k)});
-document.addEventListener('keydown',e=>{if(!$('#ov').hidden||!$('#vt').hidden)return;const m={'*':'×','/':'÷','-':'−'};
+$('#app').addEventListener('click',e=>{const b=e.target.closest('button');if(!b||!b.dataset.k)return;press(b.dataset.k)});
+document.addEventListener('keydown',e=>{if(!$('#ov').hidden||!$('#vt').hidden||!$('#hv').hidden)return;const m={'*':'×','/':'÷','-':'−'};
  if(/^[0-9.+()^%]$/.test(e.key))press(e.key);else if(m[e.key])press(m[e.key]);else if(e.key==='Enter'){e.preventDefault();press('=')}else if(e.key==='Backspace')press('bk');else if(e.key==='Escape')press('ac')});
 /* ---------- crypto ---------- */
 const b64=u=>btoa(String.fromCharCode(...new Uint8Array(u))),ub=s=>Uint8Array.from(atob(s),c=>c.charCodeAt(0));
@@ -151,21 +174,21 @@ async function persist(){const iv=crypto.getRandomValues(new Uint8Array(12));
  try{localStorage.setItem('calc.v',JSON.stringify(V))}catch(e){toast('Could not save on this device')}}
 /* ---------- dialogs ---------- */
 const dlg=h=>{const o=$('#ov');o.innerHTML=`<div class="dlg">${h}</div>`;o.hidden=false};
-const close=()=>{$('#ov').hidden=true;$('#ov').innerHTML=''};
+const close=()=>{$('#ov').hidden=true;$('#ov').innerHTML='';mxOff()};
 function askPass(seq){
  dlg(`<h3>Enter passcode</h3><input id="pw" type="password" autocomplete="off" autocapitalize="off" spellcheck="false"><div class="err" id="er"></div><div class="acts"><button class="ghost" id="no">Cancel</button><button class="pill" id="go">OK</button></div>`);
- $('#pw').focus();$('#no').onclick=close;
- const go=async()=>{$('#go').disabled=true;try{const k=await dk(seq,$('#pw').value,ub(V.s));
-  items=JSON.parse(dec.decode(await crypto.subtle.decrypt({name:'AES-GCM',iv:ub(V.iv)},k,ub(V.d))));K=k;close();sel=-1;showPw=false;vault()}
-  catch(e){$('#er').textContent='Incorrect passcode';$('#go').disabled=false;$('#pw').select()}};
+ $('#pw').focus();mxOn();$('#no').onclick=close;
+ const go=async()=>{const f=fget(),w=Math.ceil((f.u-Date.now())/1000);if(w>0)return $('#er').textContent='Too many wrong tries. Wait '+w+' seconds.';$('#go').disabled=true;try{const k=await dk(seq,$('#pw').value,ub(V.s));
+  items=JSON.parse(dec.decode(await crypto.subtle.decrypt({name:'AES-GCM',iv:ub(V.iv)},k,ub(V.d))));K=k;fset({n:0,u:0});close();sel=-1;showPw=false;vault()}
+  catch(e){const n=f.n+1,t=n>=3?Math.min(30*2**(n-3),3600):0;fset({n,u:t?Date.now()+t*1000:0});$('#er').textContent=t?'Incorrect. Wait '+t+' seconds before trying again.':'Incorrect passcode';$('#go').disabled=false;$('#pw').select()}};
  $('#go').onclick=go;$('#pw').onkeydown=e=>{if(e.key==='Enter')go()};
 }
 let su=null,suP='';
 const sb=t=>{const b=$('#sb');b.hidden=!t;document.body.classList.toggle('su',!!t);if(t)b.querySelector('span').textContent=t};
-function suEnd(){su=null;suP='';sb('');close();ex='';last='';res='';done=false;draw()}
+function suEnd(){const c=su&&su.chg&&items;su=null;suP='';sb('');close();ex='';last='';res='';done=false;draw();if(c)vault()}
 function suWelcome(){
  dlg(`<h3>Set up your vault</h3><p>This takes about a minute. Here is what happens:</p><ol style="color:var(--mut);font-size:14px;padding-left:20px;margin:0 0 12px;line-height:1.6"><li>Press your secret keys and =</li><li>Press the same keys again to confirm</li><li>Choose a passcode</li><li>Test it once</li><li>Save a reminder of how to open it</li></ol><p><b>There is no recovery.</b> If you forget your keys or passcode, nothing can bring your passwords back.</p><div class="acts"><button class="ghost" id="no">Cancel</button><button class="pill" id="go">Start</button></div>`);
- $('#no').onclick=suEnd;$('#go').onclick=()=>{close();su={step:1};ex='';last='';res='';done=false;draw();sb('Step 1 of 5: press your secret keys, then =')};
+ mxOn();$('#no').onclick=suEnd;$('#go').onclick=()=>{close();su={step:1};ex='';last='';res='';done=false;draw();sb('Step 1 of 5: press your secret keys, then =')};
 }
 function suSeq(seq,r){
  if(r==='Error'||seq.length<3)return sb('Use at least 3 keys that give a number, then press =');
@@ -175,41 +198,58 @@ function suSeq(seq,r){
 }
 function suPass(){
  sb('');
- dlg(`<h3>Step 3 of 5: choose a passcode</h3><p>Letters and numbers, at least 6 characters. Do not include the answer (${esc(su.res)}) here.</p><input id="p1" type="password" placeholder="Passcode" autocomplete="off" autocapitalize="off"><input id="p2" type="password" placeholder="Confirm passcode" autocomplete="off" autocapitalize="off"><div class="err" id="er"></div><div class="acts"><button class="ghost" id="no">Cancel</button><button class="pill" id="go">Next</button></div>`);
- $('#no').onclick=suEnd;$('#p1').focus();
- $('#go').onclick=()=>{const a=$('#p1').value;if(a.length<6)return $('#er').textContent='Use at least 6 characters';if(a!==$('#p2').value)return $('#er').textContent='Passcodes do not match';suP=a;suTest()};
+ dlg(`<h3>Step 3 of 5: choose a passcode</h3><p>Use at least 10 characters. A few random words works well. Do not include the answer (${esc(su.res)}) here.</p><input id="p1" type="password" placeholder="Passcode" autocomplete="off" autocapitalize="off"><div id="mb" style="height:6px;border-radius:3px;background:var(--ln);margin:-4px 0 4px"><div id="mf" style="height:100%;border-radius:3px;width:0;transition:width .2s"></div></div><div class="mut" id="mt" style="margin:0 0 8px;min-height:18px"></div><input id="p2" type="password" placeholder="Confirm passcode" autocomplete="off" autocapitalize="off"><div class="err" id="er"></div><div class="acts"><button class="ghost" id="no">Cancel</button><button class="pill" id="go">Next</button></div>`);
+ mxOn();$('#no').onclick=suEnd;$('#p1').focus();$('#p1').oninput=meter;
+ $('#go').onclick=()=>{const a=$('#p1').value;const bad=weak(a);if(bad)return $('#er').textContent=bad;if(a!==$('#p2').value)return $('#er').textContent='Passcodes do not match';suP=a;suTest()};
 }
 function suTest(){
  dlg(`<h3>Step 4 of 5: test it</h3><p>Type your passcode followed by ${esc(su.res)}. Setup finishes only when this works, so you cannot lock yourself out.</p><input id="pw" type="password" autocomplete="off" autocapitalize="off"><div class="err" id="er"></div><div class="acts"><button class="ghost" id="no">Back</button><button class="pill" id="go">Check</button></div>`);
- $('#no').onclick=suPass;$('#pw').focus();
+ mxOn();$('#no').onclick=suPass;$('#pw').focus();
  $('#go').onclick=async()=>{if($('#pw').value!==suP+su.res)return $('#er').textContent='That is not your passcode followed by '+su.res+'. Try again.';
   $('#go').disabled=true;const s=b64(crypto.getRandomValues(new Uint8Array(16)));
-  V={s,h:await sh(s+su.seq)};K=await dk(su.seq,suP+su.res,ub(s));items=[];await persist();suDone()};
+  if(su.chg&&!items){suEnd();return}V={s,h:await sh(s+su.seq)};K=await dk(su.seq,suP+su.res,ub(s));items=su.chg?items:[];hist=hist.filter(h=>h.x!==su.seq);saveH();fset({n:0,u:0});await persist();suDone()};
 }
 function suDone(){
- dlg(`<h3>Step 5 of 5: you are set</h3><div class="card" style="margin:10px 0"><div class="f"><b>1. Press these keys</b><span>${esc(disp(su.seq))} =</span></div><div class="f"><b>2. Type your passcode followed by</b><span>${esc(su.res)}</span></div></div><p>Write this down somewhere safe. The app does not keep this reminder, and there is no recovery.</p><div class="acts"><button class="pill" id="go">Finish</button></div>`);
+ dlg(`<h3>Step 5 of 5: you are set</h3><div class="card" style="margin:10px 0"><div class="f"><b>1. Press these keys</b><span>${esc(disp(su.seq))} =</span></div><div class="f"><b>2. Type your passcode followed by</b><span>${esc(su.res)}</span></div></div>${su.chg?'<p>Your passwords are now locked under the new sequence and passcode. Old backup files still open with the old ones, so download a fresh backup.</p>':''}<p>Write this down somewhere safe. The app does not keep this reminder, and there is no recovery.</p><div class="acts">${su.chg?'<button class="ghost" id="bk2">Download backup</button>':''}<button class="pill" id="go">Finish</button></div>`);
+ mxOn();if($('#bk2'))$('#bk2').onclick=dlb;
  $('#go').onclick=()=>{su=null;suP='';sb('');close();ex='';last='';res='';done=false;draw();sel=-1;showPw=false;vault()};
 }
 $('#sbx').onclick=suEnd;
 /* ---------- vault ---------- */
-function lock(){items=null;K=null;showPw=false;ex='';last='';res='';done=false;draw();$('#vt').hidden=true;$('#vt').innerHTML='';close()}
+const tmo=()=>{try{return+localStorage.getItem('calc.t')||60}catch(e){return 60}};
+let at;function arm(){clearTimeout(at);if(items)at=setTimeout(lock,tmo()*1000)}
+['pointerdown','keydown','input','scroll'].forEach(n=>document.addEventListener(n,arm,true));
+let cbT=null,cbAt=0;
+const wipe=()=>{if(!cbAt)return;cbAt=0;clearTimeout(cbT);try{navigator.clipboard.writeText(' ').catch(()=>{})}catch(e){}};
+document.addEventListener('visibilitychange',()=>{if(!document.hidden&&cbAt&&Date.now()>=cbAt)wipe()});
+const fget=()=>{try{return JSON.parse(localStorage.getItem('calc.f'))||{n:0,u:0}}catch(e){return{n:0,u:0}}};
+const fset=o=>{try{localStorage.setItem('calc.f',JSON.stringify(o))}catch(e){}};
+const bget=()=>{try{return+localStorage.getItem('calc.b')||0}catch(e){return 0}};
+const bset=()=>{try{localStorage.setItem('calc.b',Date.now())}catch(e){}};
+const due=()=>!!(items&&items.length&&(!bget()||Date.now()-bget()>30*864e5));
+const bkTxt=()=>{const b=bget();return b?'Last backup: '+new Date(b).toLocaleDateString()+(due()?'. It has been over 30 days. Export a backup now.':''):'No backup yet. Use Export / Import to save one.'};
+const COMMON=['password','qwerty','123456','letmein','iloveyou','welcome','admin','abc123','calculator','111111','000000','monkey','dragon','football'];
+function weak(p){const l=p.toLowerCase();if(p.length<10)return 'Use at least 10 characters';if(COMMON.some(c=>l.includes(c))||/^(.)\1+$/.test(p)||/^\d+$/.test(p))return 'That passcode is too common. Pick something harder to guess';return ''}
+function lvl(p){if(weak(p))return 0;const k=[/[a-z]/,/[A-Z]/,/\d/,/[^A-Za-z0-9]/].filter(r=>r.test(p)).length;return p.length>=14||(p.length>=12&&k>=3)?3:2}
+function meter(){const p=$('#p1').value,l=p?lvl(p):-1,f=$('#mf');f.style.width=l<0?'0':l===0?'33%':l===2?'66%':'100%';f.style.background=l===0?'#d93025':l===2?'#f9ab00':'#188038';$('#mt').textContent=l<0?'':{0:'Weak',2:'Okay',3:'Strong'}[l]}
+function lock(){clearTimeout(at);if(su&&su.chg){su=null;suP='';sb('')}items=null;K=null;showPw=false;ex='';last='';res='';done=false;draw();$('#vt').hidden=true;$('#vt').innerHTML='';close()}
 document.addEventListener('visibilitychange',()=>{if(document.hidden&&items)lock()});
 function vault(){
- const o=$('#vt');o.hidden=false;if(sel>=items.length)sel=-1;
+ arm();const o=$('#vt');o.hidden=false;if(sel>=items.length)sel=-1;
  const it=items[sel];
  const f=(l,v)=>v?`<div class="f"><b>${l}</b><span>${esc(v)}</span></div>`:'';
- o.innerHTML=`<div class="bar"><h2>Passwords</h2><button class="ghost" data-a="gear" aria-label="Settings" style="font-size:22px">⚙</button><button class="ghost" data-a="lock">Lock</button></div>
+ o.innerHTML=`<div class="bar"><h2>Passwords</h2><button class="ghost" data-a="gear" aria-label="Settings" style="font-size:22px">⚙${due()?'<span style="color:#d93025;font-size:12px;vertical-align:top">●</span>':''}</button><button class="ghost" data-a="lock">Lock</button></div>
  <div class="row">${items.length?`<select id="sl"><option value="-1"${sel<0?' selected':''}>Select Password</option>${items.map((x,i)=>`<option value="${i}"${i===sel?' selected':''}>${esc(x.site||'Untitled')}</option>`).join('')}</select>`:'<div class="mut" style="flex:1;margin:0">No passwords yet</div>'}<button class="pill" data-a="add">+ Add</button></div>
  ${it?`<div class="card">${f('Website',it.site)}${f('Username / email',it.user)}<div class="f"><b>Password</b><span>${showPw?esc(it.pw):'••••••••••'}</span></div>${f('Hint',it.hint)}${(it.sq||[]).map(x=>f('Security question: '+esc(x.q),x.a)).join('')}${f('Notes',it.notes)}${f('Last changed',new Date(it.at).toLocaleString())}
  <div class="acts"><button class="ghost" data-a="show">${showPw?'Hide':'Show'}</button><button class="ghost" data-a="cp">Copy password</button><button class="ghost" data-a="cu">Copy username</button><button class="ghost" data-a="edit">Edit</button><button class="ghost" data-a="del">Delete</button></div></div>`:''}`;
  const s=$('#sl');if(s)s.onchange=()=>{sel=+s.value;showPw=false;vault()};
 }
 let delArm=false;
-const copy=async t=>{try{await navigator.clipboard.writeText(t);toast('Copied')}catch(e){toast('Copy not available')}};
+const copy=async(t,c)=>{try{await navigator.clipboard.writeText(t);toast(c?'Copied. Clears in 30 seconds':'Copied');if(c){cbAt=Date.now()+30000;clearTimeout(cbT);cbT=setTimeout(wipe,30000)}}catch(e){toast('Copy not available')}};
 $('#vt').addEventListener('click',async e=>{const a=e.target.closest('[data-a]')?.dataset.a;if(!a)return;const it=items[sel];
  if(a==='lock')lock();else if(a==='add')form(null);else if(a==='edit')form(sel);
  else if(a==='show'){showPw=!showPw;vault()}
- else if(a==='cp')copy(it.pw);else if(a==='cu')copy(it.user||'');
+ else if(a==='cp')copy(it.pw,1);else if(a==='cu')copy(it.user||'',1);
  else if(a==='del'){if(!delArm){delArm=true;toast('Tap Delete again to confirm');setTimeout(()=>delArm=false,3000)}else{delArm=false;items.splice(sel,1);sel=-1;await persist();vault()}}
  else if(a==='gear')settings();
 });
@@ -241,15 +281,58 @@ function form(idx){
   await persist();close();vault()};
 }
 function settings(){
- dlg(`<h3>Settings</h3><label>Calculator layout</label><select id="ly">${Object.keys(LAY).map(k=>`<option value="${k}"${k===lay?' selected':''}>${LAY[k].n}</option>`).join('')}</select><div class="acts" style="justify-content:flex-start"><button class="ghost" id="xi">Export / Import</button><button class="ghost" id="rst" style="color:#d93025">Reset app</button></div><div class="acts"><button class="pill" id="no">Done</button></div>`);
- $('#no').onclick=close;$('#ly').onchange=e=>setLay(e.target.value);$('#xi').onclick=backup;
- $('#rst').onclick=()=>{dlg(`<h3>Reset app?</h3><p>This erases every saved password, your secret sequence and your passcode. Export a backup first if you want to keep them. After a reset, typing 9455= starts setup again.</p><div class="acts"><button class="ghost" id="no">Cancel</button><button class="pill" id="go" style="background:#d93025;color:#fff">Erase everything</button></div>`);$('#no').onclick=settings;$('#go').onclick=()=>{try{localStorage.removeItem('calc.v')}catch(e){}V=null;lock();toast('App reset')}};
+ dlg(`<h3>Settings</h3><label>Calculator layout</label><select id="ly">${Object.keys(LAY).map(k=>`<option value="${k}"${k===lay?' selected':''}>${LAY[k].n}</option>`).join('')}</select><label>Auto-lock after</label><select id="al">${[[30,'30 seconds'],[60,'1 minute'],[120,'2 minutes'],[300,'5 minutes']].map(([v,t])=>`<option value="${v}"${v===tmo()?' selected':''}>${t}</option>`).join('')}</select><div class="mut" style="color:${due()?'#d93025':'var(--mut)'}">${bkTxt()}</div><div class="acts" style="justify-content:flex-start"><button class="ghost" id="xi">Export / Import</button><button class="ghost" id="cs">Change sequence</button><button class="ghost" id="rst" style="color:#d93025">Reset app</button></div><div class="acts"><button class="pill" id="no">Done</button></div>`);
+ $('#no').onclick=close;$('#ly').onchange=e=>setLay(e.target.value);$('#xi').onclick=backup;$('#cs').onclick=chgSeq;$('#al').onchange=e=>{try{localStorage.setItem('calc.t',e.target.value)}catch(x){}arm()};
+ $('#rst').onclick=()=>{dlg(`<h3>Reset app?</h3><p>This erases every saved password, your secret sequence and your passcode. Export a backup first if you want to keep them. After a reset, typing 9455= starts setup again.</p><div class="acts"><button class="ghost" id="no">Cancel</button><button class="pill" id="go" style="background:#d93025;color:#fff">Erase everything</button></div>`);$('#no').onclick=settings;$('#go').onclick=()=>{try{localStorage.removeItem('calc.v');localStorage.removeItem('calc.f');localStorage.removeItem('calc.b')}catch(e){}V=null;lock();toast('App reset')}};
 }
+function dlb(){try{const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([JSON.stringify(V)],{type:'application/json'}));a.download='calculator-backup-'+new Date().toISOString().slice(0,10)+'.json';document.body.appendChild(a);a.click();a.remove();bset();toast('Backup downloaded')}catch(e){toast('Download is not available here')}}
+function chgSeq(){
+ dlg(`<h3>Change your sequence</h3><p>Your passwords stay. You will:</p><ol style="color:var(--mut);font-size:14px;padding-left:20px;margin:0 0 12px;line-height:1.6"><li>Press your new keys and =</li><li>Press the same keys again to confirm</li><li>Choose a new passcode</li><li>Test it once</li></ol><p>Nothing changes until the test works. Cancel at any step keeps your current sequence and passcode.</p><div class="acts"><button class="ghost" id="no">Cancel</button><button class="pill" id="go">Start</button></div>`);
+ $('#no').onclick=settings;$('#go').onclick=()=>{close();su={step:1,chg:1};$('#vt').hidden=true;ex='';last='';res='';done=false;draw();sb('Step 1 of 5: press your new keys, then =')};
+}
+function restoreText(t){try{const v=JSON.parse(t);if(!v.s||!v.h||!v.iv||!v.d)throw 0;localStorage.setItem('calc.v',JSON.stringify(v));V=v;lock();toast('Restored. Use your sequence and passcode.')}catch(e){const r=$('#er');if(r)r.textContent='That backup is not valid'}}
 function backup(){
- dlg(`<h3>Backup</h3><p>This text is your encrypted vault. Copy it somewhere safe. It opens only with your sequence and passcode. To restore, paste a backup below and tap Restore (this replaces what is on this device).</p><textarea id="bt" rows="6">${esc(JSON.stringify(V))}</textarea><div class="err" id="er"></div><div class="acts"><button class="ghost" id="no">Close</button><button class="ghost" id="cb">Copy</button><button class="pill" id="rs2">Restore</button></div>`);
- $('#no').onclick=close;$('#cb').onclick=()=>copy($('#bt').value);
- $('#rs2').onclick=()=>{try{const v=JSON.parse($('#bt').value);if(!v.s||!v.h||!v.iv||!v.d)throw 0;localStorage.setItem('calc.v',JSON.stringify(v));V=v;lock();toast('Restored. Use your sequence and passcode.')}catch(e){$('#er').textContent='That backup is not valid'}};
+ dlg(`<h3>Backup</h3><p>Your backup is encrypted, so it is safe to store anywhere. It opens only with your sequence and passcode. Restoring replaces what is on this device.</p><div class="acts" style="justify-content:flex-start;margin:0 0 8px"><button class="pill" id="dl">Download file</button><button class="ghost" id="rf">Restore from file</button></div><input type="file" id="fi" accept=".json,application/json" hidden><label>Or copy and paste the text</label><textarea id="bt" rows="5">${esc(JSON.stringify(V))}</textarea><div class="err" id="er"></div><div class="acts"><button class="ghost" id="no">Close</button><button class="ghost" id="cb">Copy text</button><button class="ghost" id="rs2">Restore text</button></div>`);
+ $('#no').onclick=close;
+ $('#cb').onclick=()=>{copy($('#bt').value);bset()};
+ $('#rs2').onclick=()=>restoreText($('#bt').value);
+ $('#dl').onclick=()=>{try{const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([JSON.stringify(V)],{type:'application/json'}));a.download='calculator-backup-'+new Date().toISOString().slice(0,10)+'.json';document.body.appendChild(a);a.click();a.remove();bset();toast('Backup downloaded')}catch(e){$('#er').textContent='Download is not available here. Use Copy text.'}};
+ $('#rf').onclick=()=>$('#fi').click();
+ $('#fi').onchange=e=>{const f=e.target.files[0];if(!f)return;const r=new FileReader();r.onload=()=>restoreText(String(r.result));r.readAsText(f)};
 }
+let hist=[];try{hist=JSON.parse(localStorage.getItem('calc.h'))||[]}catch(e){}
+const saveH=()=>{try{localStorage.setItem('calc.h',JSON.stringify(hist))}catch(e){}};
+function addHist(x,r){hist.unshift({x,e:disp(x),r,t:Date.now()});if(hist.length>100)hist.length=100;saveH()}
+function histView(){
+ const v=$('#hv');v.hidden=false;
+ v.innerHTML=`<div class="bar" style="padding:0 8px"><button class="ghost" data-h="x" aria-label="Back" style="font-size:22px">←</button><h2>History</h2><button class="ghost" data-h="clr">Clear</button></div><div id="hl">${hist.length?hist.map((h,i)=>`<div class="hi"><button class="hd" data-h="del" data-i="${i}" aria-label="Delete">✕</button><div class="hr" data-h="use" data-i="${i}"><div class="he">${esc(h.e)} =</div><div class="hv">${esc(h.r)}</div></div></div>`).join(''):'<div class="mut" style="text-align:center;margin-top:40px">No history</div>'}</div>`;
+}
+function confirmClear(){
+ dlg(`<h3>Clear history?</h3><p>This removes all saved calculations.</p><div class="acts"><button class="ghost" id="no">Cancel</button><button class="pill" id="go">Clear</button></div>`);
+ $('#no').onclick=close;$('#go').onclick=()=>{hist=[];saveH();close();if(!$('#hv').hidden)histView()};
+}
+$('#hv').addEventListener('click',e=>{const t=e.target.closest('[data-h]');if(!t)return;const a=t.dataset.h,i=+t.dataset.i;
+ if(a==='x')$('#hv').hidden=true;
+ else if(a==='clr')confirmClear();
+ else if(a==='del'){hist.splice(i,1);saveH();histView()}
+ else if(a==='use'&&hist[i]){ex=hist[i].r;done=false;last='';res='';$('#hv').hidden=true;draw()}});
+$('#hbtn').onclick=histView;
+$('#mnu').onclick=e=>{e.stopPropagation();$('#pm').hidden=!$('#pm').hidden};
+document.addEventListener('click',()=>{$('#pm').hidden=true});
+$('#pmc').onclick=confirmClear;
+$('#cv').onclick=()=>$('#sci').classList.toggle('open');
+let mxR=0;
+function mxOn(){const c=$('#mx');if(!c.hidden)return;c.hidden=false;document.body.classList.add('mxon');
+ const x=c.getContext&&c.getContext('2d');if(!x)return;
+ const rm=!!(window.matchMedia&&matchMedia('(prefers-reduced-motion: reduce)').matches),dpr=Math.min(devicePixelRatio||1,2),W=c.width=Math.round(innerWidth*dpr),H=c.height=Math.round(innerHeight*dpr),fs=16*dpr,cols=Math.ceil(W/fs),dr=Array.from({length:cols},()=>Math.random()*-50);
+ x.fillStyle=rm?'#04140a':'#000';x.fillRect(0,0,W,H);if(rm)return;
+ const ch='\uff71\uff72\uff73\uff74\uff75\uff76\uff77\uff78\uff79\uff7a\uff7b\uff7c\uff7d\uff7e\uff7f\uff80\uff81\uff82\uff83\uff84\uff85\uff86\uff87\uff88\uff89' + '0123456789ABCDEFZ';
+ let last=0;
+ const f=t=>{mxR=requestAnimationFrame(f);if(t-last<55)return;last=t;
+  x.fillStyle='rgba(0,0,0,.09)';x.fillRect(0,0,W,H);x.font=fs+'px monospace';
+  for(let i=0;i<cols;i++){const y=dr[i]*fs;x.fillStyle=Math.random()<.04?'#d8ffd8':'#00ff41';x.fillText(ch[Math.random()*ch.length|0],i*fs,y);if(y>H&&Math.random()>.975)dr[i]=0;dr[i]++}};
+ mxR=requestAnimationFrame(f)}
+function mxOff(){cancelAnimationFrame(mxR);const c=$('#mx');if(c)c.hidden=true;document.body.classList.remove('mxon')}
 build();draw();
 </script><script>
 setTimeout(()=>{const s=document.getElementById('splash');if(!s)return;s.classList.add('h');setTimeout(()=>s.remove(),400)},2000);
