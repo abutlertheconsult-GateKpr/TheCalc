@@ -5,16 +5,16 @@
 <link rel="manifest" href="manifest.json">
 <link rel="icon" type="image/png" href="icons/icon-192.png">
 <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
-<meta name="theme-color" content="#ffffff">
+<meta name="theme-color" content="#0c0e13">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="Calculator">
-<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-status-bar-style" content="black">
 <style>
 :root{--bg:#f6f8fc;--fg:#1d2230;--mut:#5b6272;--key:#e6eaf3;--op:#d9e0ee;--opf:#1d2230;--eq:#d6c6f6;--eqf:#3a2a62;--ak:#bccdea;--akf:#1d2230;--ln:#d6dbe6;--card:#eef1f7;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
 @media(prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0c0e13;--fg:#e6e9f2;--mut:#9aa1b3;--key:#22252e;--op:#353b4d;--opf:#e1e5f2;--eq:#ecdcff;--eqf:#4a3a6b;--ak:#46587a;--akf:#e8ecf7;--ln:#2b2f3a;--card:#1b1e26}}
 :root[data-theme="dark"]{--bg:#0c0e13;--fg:#e6e9f2;--mut:#9aa1b3;--key:#22252e;--op:#353b4d;--opf:#e1e5f2;--eq:#ecdcff;--eqf:#4a3a6b;--ak:#46587a;--akf:#e8ecf7;--ln:#2b2f3a;--card:#1b1e26}
-html,body{height:100%;margin:0}
+html,body{height:100%;margin:0;background:var(--bg)}
 body{background:var(--bg);color:var(--fg);font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;-webkit-user-select:none;user-select:none;-webkit-tap-highlight-color:transparent}
 button{font:inherit;cursor:pointer;border:0;color:var(--fg)}
 #app{height:100%;display:flex;flex-direction:column;max-width:480px;margin:0 auto;padding:0 10px 10px}
@@ -136,7 +136,7 @@ function build(){
   let t=l,on='';if(k==='deg')t=deg?'Deg':'Rad';if(k==='inv')on=inv?' class="on"':'';
   if(inv&&['sin','cos','tan'].includes(l))t=l+'⁻¹';
   return `<button data-k="${k}"${on}>${t}</button>`}).join('');
- document.documentElement.dataset.l=lay;$('#pad').innerHTML=LAY[lay].pad.map(([l,k,c])=>`<button data-k="${k||l}" ${c?`class="${c}"`:''}>${l}</button>`).join('');
+ document.documentElement.dataset.l=lay;tc();$('#pad').innerHTML=LAY[lay].pad.map(([l,k,c])=>`<button data-k="${k||l}" ${c?`class="${c}"`:''}>${l}</button>`).join('');
 }
 function press(k){
  if(k==='ac'){ex='';last='';res='';done=false;return draw()}
@@ -165,7 +165,7 @@ $('#app').addEventListener('click',e=>{const b=e.target.closest('button');if(!b|
 document.addEventListener('keydown',e=>{if(!$('#ov').hidden||!$('#vt').hidden||!$('#hv').hidden)return;const m={'*':'×','/':'÷','-':'−'};
  if(/^[0-9.+()^%]$/.test(e.key))press(e.key);else if(m[e.key])press(m[e.key]);else if(e.key==='Enter'){e.preventDefault();press('=')}else if(e.key==='Backspace')press('bk');else if(e.key==='Escape')press('ac')});
 /* ---------- crypto ---------- */
-const b64=u=>btoa(String.fromCharCode(...new Uint8Array(u))),ub=s=>Uint8Array.from(atob(s),c=>c.charCodeAt(0));
+const b64=u=>{u=new Uint8Array(u);let s='';for(let i=0;i<u.length;i+=8192)s+=String.fromCharCode.apply(null,u.subarray(i,i+8192));return btoa(s)},ub=s=>Uint8Array.from(atob(s),c=>c.charCodeAt(0));
 const sh=async s=>b64(await crypto.subtle.digest('SHA-256',enc.encode(s)));
 async function dk(seq,pw,salt){const m=await crypto.subtle.importKey('raw',enc.encode(seq+'\u0000'+pw),'PBKDF2',false,['deriveKey']);
  return crypto.subtle.deriveKey({name:'PBKDF2',salt,iterations:250000,hash:'SHA-256'},m,{name:'AES-GCM',length:256},false,['encrypt','decrypt'])}
@@ -179,8 +179,8 @@ function askPass(seq){
  dlg(`<h3>Enter passcode</h3><input id="pw" type="password" autocomplete="off" autocapitalize="off" spellcheck="false"><div class="err" id="er"></div><div class="acts"><button class="ghost" id="no">Cancel</button><button class="pill" id="go">OK</button></div>`);
  $('#pw').focus();mxOn();$('#no').onclick=close;
  const go=async()=>{const f=fget(),w=Math.ceil((f.u-Date.now())/1000);if(w>0)return $('#er').textContent='Too many wrong tries. Wait '+w+' seconds.';$('#go').disabled=true;try{const k=await dk(seq,$('#pw').value,ub(V.s));
-  items=JSON.parse(dec.decode(await crypto.subtle.decrypt({name:'AES-GCM',iv:ub(V.iv)},k,ub(V.d))));K=k;fset({n:0,u:0});close();sel=-1;showPw=false;vault()}
-  catch(e){const n=f.n+1,t=n>=3?Math.min(30*2**(n-3),3600):0;fset({n,u:t?Date.now()+t*1000:0});$('#er').textContent=t?'Incorrect. Wait '+t+' seconds before trying again.':'Incorrect passcode';$('#go').disabled=false;$('#pw').select()}};
+  items=JSON.parse(dec.decode(await crypto.subtle.decrypt({name:'AES-GCM',iv:ub(V.iv)},k,ub(V.d))));K=k;try{await ikInit()}catch(x){}fset({n:0,u:0});close();sel=-1;showPw=false;vault()}
+  catch(e){logTry();const n=f.n+1,t=n>=3?Math.min(30*2**(n-3),3600):0;fset({n,u:t?Date.now()+t*1000:0});$('#er').textContent=t?'Incorrect. Wait '+t+' seconds before trying again.':'Incorrect passcode';$('#go').disabled=false;$('#pw').select()}};
  $('#go').onclick=go;$('#pw').onkeydown=e=>{if(e.key==='Enter')go()};
 }
 let su=null,suP='';
@@ -207,7 +207,7 @@ function suTest(){
  mxOn();$('#no').onclick=suPass;$('#pw').focus();
  $('#go').onclick=async()=>{if($('#pw').value!==suP+su.res)return $('#er').textContent='That is not your passcode followed by '+su.res+'. Try again.';
   $('#go').disabled=true;const s=b64(crypto.getRandomValues(new Uint8Array(16)));
-  if(su.chg&&!items){suEnd();return}V={s,h:await sh(s+su.seq)};K=await dk(su.seq,suP+su.res,ub(s));items=su.chg?items:[];hist=hist.filter(h=>h.x!==su.seq);saveH();fset({n:0,u:0});await persist();suDone()};
+  if(su.chg&&!items){suEnd();return}V={s,h:await sh(s+su.seq)};K=await dk(su.seq,suP+su.res,ub(s));try{if(su.chg)await ikWrap();else await ikNew()}catch(x){}items=su.chg?items:[];hist=hist.filter(h=>h.x!==su.seq);saveH();fset({n:0,u:0});await persist();suDone()};
 }
 function suDone(){
  dlg(`<h3>Step 5 of 5: you are set</h3><div class="card" style="margin:10px 0"><div class="f"><b>1. Press these keys</b><span>${esc(disp(su.seq))} =</span></div><div class="f"><b>2. Type your passcode followed by</b><span>${esc(su.res)}</span></div></div>${su.chg?'<p>Your passwords are now locked under the new sequence and passcode. Old backup files still open with the old ones, so download a fresh backup.</p>':''}<p>Write this down somewhere safe. The app does not keep this reminder, and there is no recovery.</p><div class="acts">${su.chg?'<button class="ghost" id="bk2">Download backup</button>':''}<button class="pill" id="go">Finish</button></div>`);
@@ -239,7 +239,7 @@ function vault(){
  const it=items[sel];
  const f=(l,v)=>v?`<div class="f"><b>${l}</b><span>${esc(v)}</span></div>`:'';
  o.innerHTML=`<div class="bar"><h2>Passwords</h2><button class="ghost" data-a="gear" aria-label="Settings" style="font-size:22px">⚙${due()?'<span style="color:#d93025;font-size:12px;vertical-align:top">●</span>':''}</button><button class="ghost" data-a="lock">Lock</button></div>
- <div class="row">${items.length?`<select id="sl"><option value="-1"${sel<0?' selected':''}>Select Password</option>${items.map((x,i)=>`<option value="${i}"${i===sel?' selected':''}>${esc(x.site||'Untitled')}</option>`).join('')}</select>`:'<div class="mut" style="flex:1;margin:0">No passwords yet</div>'}<button class="pill" data-a="add">+ Add</button></div>
+ ${unseen()?`<div class="card" data-a="lg" style="color:#d93025;margin-bottom:12px;cursor:pointer">${unseen()} wrong passcode ${unseen()>1?'attempts':'attempt'} since you last checked. Tap to view.</div>`:''}<div class="row">${items.length?`<select id="sl"><option value="-1"${sel<0?' selected':''}>Select Password</option>${items.map((x,i)=>`<option value="${i}"${i===sel?' selected':''}>${esc(x.site||'Untitled')}</option>`).join('')}</select>`:'<div class="mut" style="flex:1;margin:0">No passwords yet</div>'}<button class="pill" data-a="add">+ Add</button></div>
  ${it?`<div class="card">${f('Website',it.site)}${f('Username / email',it.user)}<div class="f"><b>Password</b><span>${showPw?esc(it.pw):'••••••••••'}</span></div>${f('Hint',it.hint)}${(it.sq||[]).map(x=>f('Security question: '+esc(x.q),x.a)).join('')}${f('Notes',it.notes)}${f('Last changed',new Date(it.at).toLocaleString())}
  <div class="acts"><button class="ghost" data-a="show">${showPw?'Hide':'Show'}</button><button class="ghost" data-a="cp">Copy password</button><button class="ghost" data-a="cu">Copy username</button><button class="ghost" data-a="edit">Edit</button><button class="ghost" data-a="del">Delete</button></div></div>`:''}`;
  const s=$('#sl');if(s)s.onchange=()=>{sel=+s.value;showPw=false;vault()};
@@ -251,7 +251,7 @@ $('#vt').addEventListener('click',async e=>{const a=e.target.closest('[data-a]')
  else if(a==='show'){showPw=!showPw;vault()}
  else if(a==='cp')copy(it.pw,1);else if(a==='cu')copy(it.user||'',1);
  else if(a==='del'){if(!delArm){delArm=true;toast('Tap Delete again to confirm');setTimeout(()=>delArm=false,3000)}else{delArm=false;items.splice(sel,1);sel=-1;await persist();vault()}}
- else if(a==='gear')settings();
+ else if(a==='gear')settings();else if(a==='lg')logView();
 });
 function gen(){const c='abcdefghijkmnopqrstuvwxyzABCDEFGHJKLMNPQRSTUVWXYZ23456789!@#$%^&*-_';const r=crypto.getRandomValues(new Uint32Array(18));return[...r].map(n=>c[n%c.length]).join('')}
 function sqRow(q='',a=''){return `<div class="sqr"><input placeholder="Question" value="${esc(q)}"><input placeholder="Answer" value="${esc(a)}"></div>`}
@@ -281,9 +281,9 @@ function form(idx){
   await persist();close();vault()};
 }
 function settings(){
- dlg(`<h3>Settings</h3><label>Calculator layout</label><select id="ly">${Object.keys(LAY).map(k=>`<option value="${k}"${k===lay?' selected':''}>${LAY[k].n}</option>`).join('')}</select><label>Auto-lock after</label><select id="al">${[[30,'30 seconds'],[60,'1 minute'],[120,'2 minutes'],[300,'5 minutes']].map(([v,t])=>`<option value="${v}"${v===tmo()?' selected':''}>${t}</option>`).join('')}</select><div class="mut" style="color:${due()?'#d93025':'var(--mut)'}">${bkTxt()}</div><div class="acts" style="justify-content:flex-start"><button class="ghost" id="xi">Export / Import</button><button class="ghost" id="cs">Change sequence</button><button class="ghost" id="rst" style="color:#d93025">Reset app</button></div><div class="acts"><button class="pill" id="no">Done</button></div>`);
- $('#no').onclick=close;$('#ly').onchange=e=>setLay(e.target.value);$('#xi').onclick=backup;$('#cs').onclick=chgSeq;$('#al').onchange=e=>{try{localStorage.setItem('calc.t',e.target.value)}catch(x){}arm()};
- $('#rst').onclick=()=>{dlg(`<h3>Reset app?</h3><p>This erases every saved password, your secret sequence and your passcode. Export a backup first if you want to keep them. After a reset, typing 9455= starts setup again.</p><div class="acts"><button class="ghost" id="no">Cancel</button><button class="pill" id="go" style="background:#d93025;color:#fff">Erase everything</button></div>`);$('#no').onclick=settings;$('#go').onclick=()=>{try{localStorage.removeItem('calc.v');localStorage.removeItem('calc.f');localStorage.removeItem('calc.b')}catch(e){}V=null;lock();toast('App reset')}};
+ dlg(`<h3>Settings</h3><label>Calculator layout</label><select id="ly">${Object.keys(LAY).map(k=>`<option value="${k}"${k===lay?' selected':''}>${LAY[k].n}</option>`).join('')}</select><label>Auto-lock after</label><select id="al">${[[30,'30 seconds'],[60,'1 minute'],[120,'2 minutes'],[300,'5 minutes']].map(([v,t])=>`<option value="${v}"${v===tmo()?' selected':''}>${t}</option>`).join('')}</select><div class="mut" style="color:${due()?'#d93025':'var(--mut)'}">${bkTxt()}</div><div class="acts" style="justify-content:flex-start"><button class="ghost" id="ipb">Intruder photos: ${ipOn()?'On':'Off'}</button><button class="ghost" id="lgb">Intruder log</button></div><div class="acts" style="justify-content:flex-start"><button class="ghost" id="xi">Export / Import</button><button class="ghost" id="cs">Change sequence</button><button class="ghost" id="rst" style="color:#d93025">Reset app</button></div><div class="acts"><button class="pill" id="no">Done</button></div>`);
+ $('#no').onclick=close;$('#ly').onchange=e=>setLay(e.target.value);$('#xi').onclick=backup;$('#cs').onclick=chgSeq;$('#ipb').onclick=ipToggle;$('#lgb').onclick=logView;$('#al').onchange=e=>{try{localStorage.setItem('calc.t',e.target.value)}catch(x){}arm()};
+ $('#rst').onclick=()=>{dlg(`<h3>Reset app?</h3><p>This erases every saved password, your secret sequence and your passcode. Export a backup first if you want to keep them. After a reset, typing 9455= starts setup again.</p><div class="acts"><button class="ghost" id="no">Cancel</button><button class="pill" id="go" style="background:#d93025;color:#fff">Erase everything</button></div>`);$('#no').onclick=settings;$('#go').onclick=()=>{try{localStorage.removeItem('calc.v');localStorage.removeItem('calc.f');localStorage.removeItem('calc.b');['calc.sk','calc.pk','calc.lg','calc.ls'].forEach(k=>localStorage.removeItem(k))}catch(e){}V=null;lock();toast('App reset')}};
 }
 function dlb(){try{const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([JSON.stringify(V)],{type:'application/json'}));a.download='calculator-backup-'+new Date().toISOString().slice(0,10)+'.json';document.body.appendChild(a);a.click();a.remove();bset();toast('Backup downloaded')}catch(e){toast('Download is not available here')}}
 function chgSeq(){
@@ -321,6 +321,54 @@ $('#mnu').onclick=e=>{e.stopPropagation();$('#pm').hidden=!$('#pm').hidden};
 document.addEventListener('click',()=>{$('#pm').hidden=true});
 $('#pmc').onclick=confirmClear;
 $('#cv').onclick=()=>$('#sci').classList.toggle('open');
+const ipOn=()=>{try{return localStorage.getItem('calc.ip')==='1'}catch(e){return false}};
+const lgGet=()=>{try{return JSON.parse(localStorage.getItem('calc.lg')||'[]')}catch(e){return[]}};
+const lgSet=a=>{try{localStorage.setItem('calc.lg',JSON.stringify(a.slice(0,20)))}catch(e){}};
+const unseen=()=>{let t=0;try{t=+localStorage.getItem('calc.ls')||0}catch(e){}return lgGet().filter(r=>r.t>t).length};
+const RSA={name:'RSA-OAEP',hash:'SHA-256'};let PRIV=null;
+async function ikWrap(){if(!PRIV)return;const iv=crypto.getRandomValues(new Uint8Array(12)),d=await crypto.subtle.encrypt({name:'AES-GCM',iv},K,enc.encode(JSON.stringify(await crypto.subtle.exportKey('jwk',PRIV))));localStorage.setItem('calc.sk',JSON.stringify({iv:b64(iv),d:b64(d)}))}
+async function ikNew(){const kp=await crypto.subtle.generateKey({name:'RSA-OAEP',modulusLength:2048,publicExponent:new Uint8Array([1,0,1]),hash:'SHA-256'},true,['encrypt','decrypt']);PRIV=kp.privateKey;localStorage.setItem('calc.pk',JSON.stringify(await crypto.subtle.exportKey('jwk',kp.publicKey)));await ikWrap();localStorage.removeItem('calc.lg')}
+async function ikInit(){try{const w=JSON.parse(localStorage.getItem('calc.sk'));if(w){PRIV=await crypto.subtle.importKey('jwk',JSON.parse(dec.decode(await crypto.subtle.decrypt({name:'AES-GCM',iv:ub(w.iv)},K,ub(w.d)))),RSA,true,['decrypt']);return}}catch(e){}await ikNew()}
+async function recEnc(o,pub){const ak=await crypto.subtle.generateKey({name:'AES-GCM',length:256},true,['encrypt']),iv=crypto.getRandomValues(new Uint8Array(12)),d=await crypto.subtle.encrypt({name:'AES-GCM',iv},ak,enc.encode(JSON.stringify(o))),k=await crypto.subtle.encrypt({name:'RSA-OAEP'},pub,await crypto.subtle.exportKey('raw',ak));return{k:b64(k),iv:b64(iv),d:b64(d)}}
+async function recDec(r){const ak=await crypto.subtle.importKey('raw',await crypto.subtle.decrypt({name:'RSA-OAEP'},PRIV,ub(r.k)),'AES-GCM',false,['decrypt']);return JSON.parse(dec.decode(await crypto.subtle.decrypt({name:'AES-GCM',iv:ub(r.iv)},ak,ub(r.d))))}
+async function snap(){
+ if(!ipOn())return null;
+ try{if(navigator.permissions){const p=await navigator.permissions.query({name:'camera'});if(p.state!=='granted')return null}}catch(e){}
+ let st;
+ try{
+  st=await navigator.mediaDevices.getUserMedia({video:{facingMode:'user',width:{ideal:640},height:{ideal:480}},audio:false});
+  const v=document.createElement('video');v.muted=true;v.playsInline=true;v.srcObject=st;
+  await Promise.race([v.play(),new Promise((_,r)=>setTimeout(r,3000))]);
+  await new Promise(r=>setTimeout(r,500));
+  const w=Math.min(480,v.videoWidth||480),h=Math.round(w*(v.videoHeight||360)/(v.videoWidth||480)),c=document.createElement('canvas');c.width=w;c.height=h;c.getContext('2d').drawImage(v,0,0,w,h);
+  return c.toDataURL('image/jpeg',0.6)
+ }catch(e){return null}
+ finally{if(st)st.getTracks().forEach(t=>t.stop())}
+}
+async function logTry(){
+ const t=Date.now();lgSet([{t},...lgGet()]);
+ try{const ph=await snap(),pk=localStorage.getItem('calc.pk');if(!ph||!pk)return;
+  const pub=await crypto.subtle.importKey('jwk',JSON.parse(pk),RSA,false,['encrypt']),e=await recEnc({p:ph},pub);
+  lgSet(lgGet().map(r=>r.t===t?{...r,...e}:r))}catch(x){}
+}
+async function ipToggle(){
+ if(ipOn()){try{localStorage.setItem('calc.ip','0')}catch(e){}toast('Intruder photos off');return settings()}
+ if(!navigator.mediaDevices||!navigator.mediaDevices.getUserMedia){toast('Camera is not available here');return}
+ try{const st=await navigator.mediaDevices.getUserMedia({video:{facingMode:'user'}});st.getTracks().forEach(t=>t.stop());localStorage.setItem('calc.ip','1');toast('Intruder photos on')}
+ catch(e){toast('Camera permission was not given')}
+ settings();
+}
+function logView(){
+ try{localStorage.setItem('calc.ls',Date.now())}catch(e){}
+ const a=lgGet();
+ dlg(`<h3>Intruder log</h3><p>Wrong passcode attempts. Photos are locked and only open here. The latest 20 are kept.</p><div id="lgl">${a.length?a.map((r,i)=>`<div class="f"><b>${esc(new Date(r.t).toLocaleString())}</b><span class="lgp">${r.d?'Loading photo\u2026':'No photo'}</span><div class="acts" style="margin:4px 0 0;justify-content:flex-start"><button class="ghost" data-lg="del" data-i="${i}">Delete</button></div></div>`).join(''):'<div class="mut">No attempts recorded</div>'}</div><div class="acts"><button class="ghost" id="lgc">Clear log</button><button class="pill" id="no">Done</button></div>`);
+ $('#no').onclick=settings;$('#lgc').onclick=()=>{lgSet([]);logView()};
+ $('#lgl').addEventListener('click',e=>{const b=e.target.closest('[data-lg]');if(!b)return;const n=lgGet();n.splice(+b.dataset.i,1);lgSet(n);logView()});
+ a.forEach((r,i)=>{if(!r.d)return;const el=$('#lgl').children[i].querySelector('.lgp');
+  recDec(r).then(o=>{const im=new Image();im.src=o.p;im.style.cssText='width:100%;border-radius:10px;margin-top:6px;display:block';el.replaceChildren(im)}).catch(()=>{el.textContent='Photo unavailable'})});
+}
+function tc(){const bg=getComputedStyle(document.documentElement).getPropertyValue('--bg').trim(),m=document.querySelector('meta[name=theme-color]');if(bg&&m)m.content=bg}
+try{matchMedia('(prefers-color-scheme: dark)').addEventListener('change',tc)}catch(e){}
 let mxR=0;
 function mxOn(){const c=$('#mx');if(!c.hidden)return;c.hidden=false;document.body.classList.add('mxon');
  const x=c.getContext&&c.getContext('2d');if(!x)return;
