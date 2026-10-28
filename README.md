@@ -6,7 +6,7 @@ CALCULATOR APP - HOW TO PUT IT ON GITHUB AND YOUR PHONE
 1. On github.com, create a new repository. A plain name like "calculator" is best.
 2. Upload everything in this folder (index.html, manifest.json, sw.js and the icons folder). Keep the same file names and folders.
 3. In the repository, open Settings, then Pages. Under Branch, choose "main" and the "/ (root)" folder, then Save.
-4. Wait a minute or two. GitHub shows your web address, which looks like https://yourname.github.io/calculator/
+4. Wait a minute or two. GitHub shows your web address, which looks like https://abutlertheconsult-gatekpr.github.io/TheCalc/
 5. Open that address on your phone.
    iPhone (Safari): tap Share, then Add to Home Screen.
    Android (Chrome): tap the menu, then Install app or Add to Home screen.
